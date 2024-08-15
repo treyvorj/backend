@@ -1,8 +1,3 @@
-from fastapi import FastAPI
-from app.api.main import api_router
+from app import init_app
 
-app = FastAPI(
-    title="Ping Test",
-)
-
-app.include_router(api_router)
+server = init_app()
