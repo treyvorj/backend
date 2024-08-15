@@ -1,11 +1,14 @@
 from uuid6 import uuid7
 
 from sqlalchemy import Column, String, select, Float
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from app.db import Base
+from app import models
 
 
 class Site(Base):
@@ -22,8 +25,15 @@ class Site(Base):
     status = Column(String())
     avg_time = Column(Float())
 
-    # relationships
-    # TODO: results = relationship(pingresult)
+    # site to results
+    result_associations = relationship(
+        "SiteToResult", back_populates="site", passive_deletes=True
+    )
+    results = association_proxy(
+        "result_associations",
+        "site",
+        creator=lambda site: models.SiteToResult(site=site),
+    )
 
     # these methods could (and should imo) easily be genericized to a base class
     # but this will do for now with how small this project is

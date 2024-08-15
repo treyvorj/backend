@@ -11,7 +11,7 @@ import subprocess
 router = APIRouter()
 
 
-class PingResult(BaseModel):
+class Result(BaseModel):
     time: float
 
 
@@ -22,8 +22,9 @@ class SiteBaseSchema(BaseModel):
 
 
 class SiteFullSchema(SiteBaseSchema):
+    id: uuid.UUID
     status: str | None = None
-    results: list[PingResult] | None = None
+    results: list[Result] | None = None
     avg_time: float | None = None
 
 
@@ -45,6 +46,33 @@ async def get_site(
 ) -> SiteFullSchema:
     """Returns site by ID"""
     site = await SiteModel.get(db, id=site_id)
+    return site
+
+
+@router.post("/{site_id}/run", response_model=SiteFullSchema)
+async def run_trace(
+    site_id: uuid.UUID, db: AsyncSession = Depends(get_db_session)
+) -> SiteFullSchema:
+    """Returns site by ID"""
+    site = await SiteModel.get(db, id=site_id)
+    results = []
+    avg_time = None
+    try:
+        results, avg_time = _run_test(site)
+    except Exception as e:
+        print(str(e))
+        site.status = "FAILURE"
+
+    if len(results) > 0:
+        site.status = "SUCCESS"
+    else:
+        site.status = "NO RESULTS"
+
+    if avg_time:
+        site.avg_time = avg_time
+    # TODO: append results
+    await db.commit()
+
     return site
 
 
