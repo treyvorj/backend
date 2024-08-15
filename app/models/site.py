@@ -17,7 +17,7 @@ class Site(Base):
     __tablename__ = "sites"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid7)
     name = Column(String(), nullable=False)
-    url = Column(String(), nullable=False)
+    url = Column(String(), nullable=False, unique=True)
     img = Column(String())
     status = Column(String())
     avg_time = Column(Float())
