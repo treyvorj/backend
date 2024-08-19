@@ -16,7 +16,11 @@ def init_app(init_db=True):
             if session_manager._engine is not None:
                 await session_manager.close()
 
-    server = FastAPI(title="Ping Test", lifespan=lifespan)
+    server = FastAPI(
+        title="Trace",
+        summary="a simple tcp traceroute api.",
+        lifespan=lifespan,
+    )
 
     from app.api.main import api_router
 

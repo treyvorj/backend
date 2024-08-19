@@ -24,7 +24,7 @@ class SiteBaseSchema(BaseModel):
 class SiteFullSchema(SiteBaseSchema):
     id: uuid.UUID
     status: str | None = None
-    results: list[Result] | None = None
+    # results: list[Result] | None = None
     avg_time: float | None = None
 
 
@@ -118,7 +118,7 @@ def _run_test(site: SiteModel) -> tuple[list, float | None]:
     tot_time: float = 0.0
     for time in match:
         float_time = float(re.search(r"\d+.\d+", time).group(0))
-        results.append(PingResult(**{"time": float_time}))
+        results.append(Result(**{"time": float_time}))
         tot_time += float_time
 
     avg_time = None
